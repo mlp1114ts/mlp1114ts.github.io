@@ -1,25 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>no18</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>启动</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center}
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;}
+
+        input {
+            flex: 5;
+            padding: 15px;
+            transition: border-color 0.3s}
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .json-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .url-output {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            background: #48bb78;
+            border-radius: 6px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .copy-btn:hover {
+            background: #38a169;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-<script>
-    alert("你未满18岁，不得进入！！！")
-    function a(b,c,d,e) {
-        let f = b *b*c;
-        let g = {
-            q:'p',
-            n:'m',
-            r:d-e
-        };let p;let q;
-                                            p = '你怎么还不走？'
-        alert(p);q = g.r + g.n+'l' + g.q;return f + q
-    }var q = a(999,888,777,666);
-    for(var mmnn = 0;mmnn<5;mmnn++){alert(mmnn)}
-    alert(`密码是：${q}`)
-</script>
+<div class="container">
+    <h1>控制端</h1>
 
+    <div class="input-group">
+        <input type="text" id="commandInput">
+        <button id="generateBtn">生成JSON</button>
+    </div>
+
+    <div class="result" id="result">
+        <h3>生成的JSON数据:</h3>
+        <div class="json-output" id="jsonOutput"></div>
+
+        <h3>分享链接:</h3>
+        <div class="url-output" id="urlOutput"></div>
+        <button class="copy-btn" id="copyBtn">复制链接</button>
+    </div>
+
+    <div class="info">
+        <p>提示: 将生成的链接分享给他人，他们可以通过GET请求获取JSON数据。</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const commandInput = document.getElementById('commandInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const result = document.getElementById('result');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const urlOutput = document.getElementById('urlOutput');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // 生成JSON数据
+        generateBtn.addEventListener('click', function() {
+            const command = commandInput.value.trim();
+
+            if (!command) {
+                alert('请输入内容');
+                return;
+            }
+
+            // 生成JSON数据
+            const jsonData = { command: command };
+            const jsonString = JSON.stringify(jsonData, null, 2);
+
+            // 显示JSON数据
+            jsonOutput.textContent = jsonString;
+
+            // 生成分享链接（使用URL参数）
+            const url = new URL(window.location.href);
+            url.searchParams.set('command', command);
+
+            // 显示分享链接
+            urlOutput.textContent = url.toString();
+
+            // 显示结果区域
+            result.style.display = 'block';
+        });
+
+        // 复制链接功能
+        copyBtn.addEventListener('click', function() {
+            const url = urlOutput.textContent;
+
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '已复制!';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('复制失败: ', err);
+                    alert('复制失败，请手动复制链接');
+                });
+        });
+
+        // 页面加载时检查URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const commandParam = urlParams.get('command');
+
+        if (commandParam) {
+            // 如果有command参数，显示对应的JSON
+            commandInput.value = commandParam;
+            generateBtn.click();
+        }
+    });
+</script>
 </body>
 </html>
